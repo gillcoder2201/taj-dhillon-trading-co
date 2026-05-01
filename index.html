@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taj Dhillon Trading Co. - Smart Calculator</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #eef2f3; display: flex; justify-content: center; padding: 20px; }
+        .calc-card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.15); width: 100%; max-width: 450px; }
+        h2 { color: #1a5276; text-align: center; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+        .sub-text { text-align: center; color: #7f8c8d; margin-bottom: 25px; font-weight: 500; }
+        .input-group { margin-bottom: 18px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; }
+        select, input { width: 100%; padding: 12px; border: 2px solid #d5dbdb; border-radius: 10px; font-size: 16px; transition: 0.3s; box-sizing: border-box; }
+        select:focus, input:focus { border-color: #3498db; outline: none; }
+        .result-box { background: #f7f9f9; padding: 20px; border-radius: 12px; margin-top: 25px; border: 1px solid #ebedef; }
+        .result-line { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 17px; color: #34495e; }
+        .total-amt { font-weight: 800; color: #1d8348; font-size: 24px; border-top: 2px solid #d5dbdb; pt: 10px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="calc-card">
+    <h2>Taj Dhillon Trading Co.</h2>
+    <div class="sub-text">Arhat Hisab Calculator</div>
+
+    <div class="input-group">
+        <label>Anaj Select Karein (Crop)</label>
+        <select id="crop" onchange="updateBharti()">
+            <option value="paddy">Paddy (Jhona)</option>
+            <option value="wheat">Wheat (Kanak)</option>
+        </select>
+    </div>
+
+    <div class="input-group">
+        <label>Bharti (Bag Weight)</label>
+        <select id="bharti" onchange="calculate()">
+            </select>
+    </div>
+
+    <div class="input-group">
+        <label>Total Bags (Gathri)</label>
+        <input type="number" id="bags" placeholder="e.g. 100" oninput="calculate()">
+    </div>
+
+    <div class="input-group">
+        <label>Rate (Per Quintal ₹)</label>
+        <input type="number" id="rate" placeholder="e.g. 2320" oninput="calculate()">
+    </div>
+
+    <div class="result-box">
+        <div class="result-line">
+            <span>Total Weight:</span>
+            <span id="totalWeight">0.00 Qtl</span>
+        </div>
+        <div class="result-line total-amt">
+            <span>Total Amount:</span>
+            <span id="totalPay">₹ 0.00</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updateBharti() {
+        const crop = document.getElementById('crop').value;
+        const bhartiDropdown = document.getElementById('bharti');
+        bhartiDropdown.innerHTML = ''; // Clear old options
+
+        if (crop === 'paddy') {
+            const options = [35, 37.5, 50];
+            options.forEach(val => {
+                let opt = document.createElement('option');
+                opt.value = val;
+                opt.innerHTML = val + " Kg";
+                bhartiDropdown.appendChild(opt);
+            });
+        } else {
+            let opt = document.createElement('option');
+            opt.value = 50;
+            opt.innerHTML = "50 Kg";
+            bhartiDropdown.appendChild(opt);
+        }
+        calculate();
+    }
+
+    function calculate() {
+        const bharti = parseFloat(document.getElementById('bharti').value) || 0;
+        const bags = parseFloat(document.getElementById('bags').value) || 0;
+        const rate = parseFloat(document.getElementById('rate').value) || 0;
+
+        // Calculate total weight in quintals
+        const totalWeightKg = bharti * bags;
+        const totalWeightQtl = totalWeightKg / 100;
+
+        // Final Amount
+        const totalAmount = totalWeightQtl * rate;
+
+        document.getElementById('totalWeight').innerText = totalWeightQtl.toFixed(2) + " Qtl";
+        document.getElementById('totalPay').innerText = "₹ " + totalAmount.toLocaleString('en-IN', {
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 2
+        });
+    }
+
+    // Initialize on load
+    updateBharti();
+</script>
+
+</body>
+</html>
