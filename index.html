@@ -3,29 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Taj Dhillon Trading Co. - Smart Calculator</title>
+    <title>Taj Dhillon Trading Co. - Advanced Calculator</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #eef2f3; display: flex; justify-content: center; padding: 20px; }
-        .calc-card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.15); width: 100%; max-width: 450px; }
-        h2 { color: #1a5276; text-align: center; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
-        .sub-text { text-align: center; color: #7f8c8d; margin-bottom: 25px; font-weight: 500; }
-        .input-group { margin-bottom: 18px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; }
-        select, input { width: 100%; padding: 12px; border: 2px solid #d5dbdb; border-radius: 10px; font-size: 16px; transition: 0.3s; box-sizing: border-box; }
-        select:focus, input:focus { border-color: #3498db; outline: none; }
-        .result-box { background: #f7f9f9; padding: 20px; border-radius: 12px; margin-top: 25px; border: 1px solid #ebedef; }
-        .result-line { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 17px; color: #34495e; }
-        .total-amt { font-weight: 800; color: #1d8348; font-size: 24px; border-top: 2px solid #d5dbdb; pt: 10px; margin-top: 10px; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f4f8; display: flex; justify-content: center; padding: 20px; }
+        .calc-card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 450px; }
+        h2 { color: #1a5276; text-align: center; margin-bottom: 20px; border-bottom: 2px solid #3498db; pb: 10px; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #34495e; }
+        select, input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        .result-box { background: #e8f6f3; padding: 15px; border-radius: 10px; margin-top: 20px; border: 1px solid #d1f2eb; }
+        .result-line { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 16px; color: #2c3e50; }
+        .total-amt { font-weight: bold; color: #196f3d; font-size: 22px; border-top: 1px solid #abd6c1; padding-top: 10px; }
+        .highlight { color: #e67e22; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="calc-card">
     <h2>Taj Dhillon Trading Co.</h2>
-    <div class="sub-text">Arhat Hisab Calculator</div>
 
     <div class="input-group">
-        <label>Anaj Select Karein (Crop)</label>
+        <label>Anaj (Crop)</label>
         <select id="crop" onchange="updateBharti()">
             <option value="paddy">Paddy (Jhona)</option>
             <option value="wheat">Wheat (Kanak)</option>
@@ -33,14 +31,14 @@
     </div>
 
     <div class="input-group">
-        <label>Bharti (Bag Weight)</label>
-        <select id="bharti" onchange="calculate()">
-            </select>
+        <label>Total Weight (Quintals)</label>
+        <input type="number" id="qtlInput" placeholder="e.g. 100" oninput="calculate()">
     </div>
 
     <div class="input-group">
-        <label>Total Bags (Gathri)</label>
-        <input type="number" id="bags" placeholder="e.g. 100" oninput="calculate()">
+        <label>Bharti (Kg per Bag)</label>
+        <select id="bharti" onchange="calculate()">
+            </select>
     </div>
 
     <div class="input-group">
@@ -48,13 +46,31 @@
         <input type="number" id="rate" placeholder="e.g. 2320" oninput="calculate()">
     </div>
 
+    <div class="input-group">
+        <label>Kaat (Deduction Kg/Quintal)</label>
+        <input type="number" id="kaat" value="0" oninput="calculate()">
+    </div>
+
+    <div class="input-group">
+        <label>Labour (Per Bag ₹)</label>
+        <input type="number" id="labour" value="0" oninput="calculate()">
+    </div>
+
     <div class="result-box">
         <div class="result-line">
-            <span>Total Weight:</span>
-            <span id="totalWeight">0.00 Qtl</span>
+            <span>Total Bags:</span>
+            <span id="bagsRes" class="highlight">0</span>
+        </div>
+        <div class="result-line">
+            <span>Net Weight (After Kaat):</span>
+            <span id="netWeight">0.00 Qtl</span>
+        </div>
+        <div class="result-line">
+            <span>Total Labour Cost:</span>
+            <span id="labourCost">₹ 0.00</span>
         </div>
         <div class="result-line total-amt">
-            <span>Total Amount:</span>
+            <span>Net Pay:</span>
             <span id="totalPay">₹ 0.00</span>
         </div>
     </div>
@@ -64,11 +80,10 @@
     function updateBharti() {
         const crop = document.getElementById('crop').value;
         const bhartiDropdown = document.getElementById('bharti');
-        bhartiDropdown.innerHTML = ''; // Clear old options
+        bhartiDropdown.innerHTML = '';
 
         if (crop === 'paddy') {
-            const options = [35, 37.5, 50];
-            options.forEach(val => {
+            [35, 37.5, 50].forEach(val => {
                 let opt = document.createElement('option');
                 opt.value = val;
                 opt.innerHTML = val + " Kg";
@@ -84,27 +99,35 @@
     }
 
     function calculate() {
-        const bharti = parseFloat(document.getElementById('bharti').value) || 0;
-        const bags = parseFloat(document.getElementById('bags').value) || 0;
+        const qtl = parseFloat(document.getElementById('qtlInput').value) || 0;
+        const bharti = parseFloat(document.getElementById('bharti').value) || 1;
         const rate = parseFloat(document.getElementById('rate').value) || 0;
+        const kaatPerQtl = parseFloat(document.getElementById('kaat').value) || 0;
+        const labourPerBag = parseFloat(document.getElementById('labour').value) || 0;
 
-        // Calculate total weight in quintals
-        const totalWeightKg = bharti * bags;
-        const totalWeightQtl = totalWeightKg / 100;
+        // 1. Calculate Bags (Quintal to Kg / Bharti)
+        const totalKg = qtl * 100;
+        const totalBags = Math.ceil(totalKg / bharti);
 
-        // Final Amount
-        const totalAmount = totalWeightQtl * rate;
+        // 2. Calculate Net Weight after Kaat
+        const totalKaatKg = qtl * kaatPerQtl;
+        const netWeightQtl = (totalKg - totalKaatKg) / 100;
 
-        document.getElementById('totalWeight').innerText = totalWeightQtl.toFixed(2) + " Qtl";
-        document.getElementById('totalPay').innerText = "₹ " + totalAmount.toLocaleString('en-IN', {
-            maximumFractionDigits: 2,
-            minimumFractionDigits: 2
-        });
+        // 3. Calculate Labour
+        const totalLabour = totalBags * labourPerBag;
+
+        // 4. Final Amount (Net Weight * Rate - Labour)
+        const finalAmount = (netWeightQtl * rate) - totalLabour;
+
+        document.getElementById('bagsRes').innerText = totalBags;
+        document.getElementById('netWeight').innerText = netWeightQtl.toFixed(2) + " Qtl";
+        document.getElementById('labourCost').innerText = "₹ " + totalLabour.toFixed(2);
+        document.getElementById('totalPay').innerText = "₹ " + finalAmount.toLocaleString('en-IN', {minimumFractionDigits: 2});
     }
 
-    // Initialize on load
     updateBharti();
 </script>
 
 </body>
 </html>
+
